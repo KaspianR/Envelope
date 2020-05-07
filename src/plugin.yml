@@ -1,0 +1,9 @@
+name: Envelope
+main: me.KaspianR.envelope.Main
+description: A simple plug-in for physically sending envelopes between players.
+version: 0.1
+api-version: 1.14
+author: KaspianR
+
+commands:
+  openEnvelope:
