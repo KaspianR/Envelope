@@ -7,7 +7,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import me.KaspianR.envelope.Main;
+import me.KaspianR.envelope.gui.LetterboxGUI;
+import me.KaspianR.envelope.gui.LetterboxHolder;
 import me.KaspianR.envelope.gui.SealEnvelopeGUI;
+import me.KaspianR.envelope.gui.SealEnvelopeHolder;
 
 public class InventoryCloseListener implements Listener {
 
@@ -25,9 +28,15 @@ public class InventoryCloseListener implements Listener {
 	@EventHandler
 	public void onInventoryClose(InventoryCloseEvent event) {
 		
-		if(event.getInventory().getClass().equals(SealEnvelopeGUI.Inv.getClass())) {
+		//Check if it is a custom inventory and execute "close" function
+		if(event.getInventory().getHolder() instanceof SealEnvelopeHolder) {
 			
 			SealEnvelopeGUI.Closed((Player) event.getPlayer(), event.getInventory());
+			
+		}
+		else if(event.getInventory().getHolder() instanceof LetterboxHolder){
+			
+			LetterboxGUI.Closed((Player) event.getPlayer(), event.getInventory(), ((LetterboxHolder) event.getInventory().getHolder()).position);
 			
 		}
 		

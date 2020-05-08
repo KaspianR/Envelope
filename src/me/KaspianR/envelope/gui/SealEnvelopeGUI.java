@@ -5,11 +5,14 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import me.KaspianR.envelope.utils.NBTEditor;
 import me.KaspianR.envelope.utils.Utils;
 
 public class SealEnvelopeGUI {
+	
+	public static JavaPlugin Main;
 	
 	public static Inventory Inv;
 	public static int InvBoxes = 9;
@@ -19,28 +22,30 @@ public class SealEnvelopeGUI {
 	public static String EnvelopeInventoryName;
 	public static String PackageInventoryName;
 	
-	public static void Initialize() {
+	public static void Initialize(JavaPlugin main) {
 		
-		EnvelopeInventoryName = Utils.Format("Envelope");
-		PackageInventoryName = Utils.Format("Package");
+		Main = main;
 		
-		Inv = Bukkit.createInventory(null, InvBoxes, "Template");
+		EnvelopeInventoryName = Utils.Format("&lEnvelope");
+		PackageInventoryName = Utils.Format("&lPackage");
+		
+		Inv = Bukkit.createInventory(new SealEnvelopeHolder(), InvBoxes, "Template");
 		
 		RedStainedGlass = Utils.CreateItem("RED_STAINED_GLASS_PANE", 1, Utils.Format("&4-"));
 		
-		Utils.AddItem(Inv, Utils.CreateItem("LIME_CONCRETE", 1, "&aSeal"), 7);
-		Utils.AddItem(Inv, Utils.CreateItem("RED_CONCRETE", 1, "&4Cancel"), 8);
+		Utils.SetItem(Inv, Utils.CreateItem("LIME_CONCRETE", 1, "&aSeal"), 7);
+		Utils.SetItem(Inv, Utils.CreateItem("RED_CONCRETE", 1, "&4Cancel"), 8);
 		
 	}
 	
-	public static Inventory Show(Player player, int Size, boolean Envelope) {
+	public static Inventory Show(int Size, boolean Envelope) {
 		
-		Inventory inventory = Bukkit.createInventory(player, InvBoxes, Envelope ? EnvelopeInventoryName : PackageInventoryName);
+		Inventory inventory = Bukkit.createInventory(new SealEnvelopeHolder(), InvBoxes, Envelope ? EnvelopeInventoryName : PackageInventoryName);
 		
 		inventory.setContents(Inv.getContents());
 		
 		for(int n = Size; n < 7; n++) {
-			Utils.AddItem(inventory, RedStainedGlass, n);
+			Utils.SetItem(inventory, RedStainedGlass, n);
 		}
 		
 		return inventory;
@@ -67,8 +72,8 @@ public class SealEnvelopeGUI {
 					
 					if(Utils.InventoryIsEmpty(inv)) {
 						
-						player.sendMessage(Utils.Format("&cThe envelope is empty!"));
-						player.closeInventory();
+						player.sendMessage(Utils.Format("&c&l[Envelope] &r&cThe envelope is empty!"));
+						Main.getServer().getScheduler().runTask(Main, new Runnable() {public void run() {player.closeInventory();}});
 						return;
 						
 					}
@@ -110,8 +115,8 @@ public class SealEnvelopeGUI {
 					
 					if(Utils.InventoryIsEmpty(inv)) {
 						
-						player.sendMessage(Utils.Format("&cThe package is empty!"));
-						player.closeInventory();
+						player.sendMessage(Utils.Format("&c&l[Envelope] &r&cThe package is empty!"));
+						Main.getServer().getScheduler().runTask(Main, new Runnable() {public void run() {player.closeInventory();}});
 						return;
 						
 					}
@@ -145,18 +150,19 @@ public class SealEnvelopeGUI {
 			}
 			else {
 				
-				player.sendMessage(Utils.Format("&c&lERROR! &r&cNOT HOLDING CONTAINER!"));
-				player.closeInventory();
+				player.sendMessage(Utils.Format("&c&l[Envelope] &r&cYour not holding a container!"));
+				
+				Main.getServer().getScheduler().runTask(Main, new Runnable() {public void run() {player.closeInventory();}});
 				return;
 				
 			}
 			
-			player.closeInventory();
+			Main.getServer().getScheduler().runTask(Main, new Runnable() {public void run() {player.closeInventory();}});
 			
 		}
 		else if(item.getItemMeta().getDisplayName().equals(Utils.Format("&4Cancel"))) {
 			
-			player.closeInventory();
+			Main.getServer().getScheduler().runTask(Main, new Runnable() {public void run() {player.closeInventory();}});
 			
 		}
 		
@@ -168,17 +174,14 @@ public class SealEnvelopeGUI {
 			
 			if(inv.getItem(n) != null) {
 				
+				//Check if it's a red stained glass pane in which case we can return because there will be no more objects
 				if(inv.getItem(n).getType().equals(Material.RED_STAINED_GLASS_PANE)) {
 					
 					return;
 					
 				}
 				
-				if(inv.getItem(n) != null) {
-					
-					player.getWorld().dropItem(player.getLocation(), inv.getItem(n));
-					
-				}
+				player.getWorld().dropItem(player.getLocation(), inv.getItem(n));
 				
 			}
 			

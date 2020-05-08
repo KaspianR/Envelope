@@ -1,30 +1,36 @@
 package me.KaspianR.envelope;
 
-import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import me.KaspianR.envelope.classes.LetterBoxCraftingRecipe;
+import me.KaspianR.envelope.classes.Letterbox;
+import me.KaspianR.envelope.gui.LetterboxGUI;
 import me.KaspianR.envelope.gui.SealEnvelopeGUI;
+import me.KaspianR.envelope.listeners.BlockBreakListener;
 import me.KaspianR.envelope.listeners.BlockPlaceListener;
 import me.KaspianR.envelope.listeners.CraftingPrepareListener;
 import me.KaspianR.envelope.listeners.InventoryClickListener;
 import me.KaspianR.envelope.listeners.InventoryCloseListener;
 import me.KaspianR.envelope.listeners.PlayerInteractListener;
-import me.KaspianR.envelope.utils.LetterBoxCraftingRecipe;
+import me.KaspianR.envelope.utils.ConfigManager;
 import me.KaspianR.envelope.utils.NBTEditor;
 import me.KaspianR.envelope.utils.Utils;
 
 public class Main extends JavaPlugin{
 	
+	public static Logger log;
+	
 	public static ItemStack Envelope;
 	public static ItemStack Packet;
-	public static ArrayList<ItemStack> LetterBoxes = new ArrayList<ItemStack>();
 	
 	public static LetterBoxCraftingRecipe[] LetterBoxTypes = {
 			new LetterBoxCraftingRecipe("eb2815b99c13bfc55b4c5c2959d157a6233ab06186459233bc1e4d4f78792c69", Material.AIR, "", ""),
@@ -40,7 +46,18 @@ public class Main extends JavaPlugin{
 			new LetterBoxCraftingRecipe("9281c01539c7c83b7427fc0b180b3dc884a1438d6bee48ceccfbef791fcac", Material.YELLOW_DYE, "Yellow", "yellow"),
 			new LetterBoxCraftingRecipe("95d9b6d47e97362f9c4bbcf9e2a7ab312383de6e63549cf05e2ce3b13bc11320", Material.BLUE_DYE, "Blue", "blue"),
 			new LetterBoxCraftingRecipe("9585e6888c19918ea7de1bf6ca8ddea5eb833a83e85c46d4e7ef7739e2f6", Material.PURPLE_DYE, "Purple", "purple")};
-
+	
+	static {
+		
+        ConfigurationSerialization.registerClass(Letterbox.class, "Letterbox");
+        
+    }
+	
+	@Override
+    public void onLoad() {
+        log = this.getLogger();
+    }
+	
 	@Override
 	public void onEnable() {
 		
@@ -56,7 +73,9 @@ public class Main extends JavaPlugin{
 		new PlayerInteractListener(this);
 		new CraftingPrepareListener(this);
 		new BlockPlaceListener(this);
-		SealEnvelopeGUI.Initialize();
+		new BlockBreakListener(this);
+		SealEnvelopeGUI.Initialize(this);
+		LetterboxGUI.Initialize(this);
 		
 		Envelope = new ItemStack(Material.PAPER, 1);
 		
@@ -91,17 +110,18 @@ public class Main extends JavaPlugin{
         //Loop through all color variants
         for(int n = 0; n < LetterBoxTypes.length; n++) {
         	
-	        LetterBoxes.add(Utils.GetSkull(LetterBoxTypes[n].url));
+        	LetterBoxTypes[n].Letterbox = Utils.GetSkull(LetterBoxTypes[n].url);
 			
 	        //Setup item
-	        ItemMeta LetterBoxMeta = LetterBoxes.get(n).getItemMeta();
+	        ItemMeta LetterBoxMeta = LetterBoxTypes[n].Letterbox.getItemMeta();
 	        LetterBoxMeta.setDisplayName(Utils.Format("&r&6" + LetterBoxTypes[n].name));
-	        LetterBoxes.get(n).setItemMeta(LetterBoxMeta);
-	        LetterBoxes.set(n, NBTEditor.AddNBTString(LetterBoxes.get(n), "LetterBox", "true"));
+	        LetterBoxTypes[n].Letterbox.setItemMeta(LetterBoxMeta);
+	        LetterBoxTypes[n].Letterbox = NBTEditor.AddNBTString(LetterBoxTypes[n].Letterbox, "LetterBox", "true");
+	        LetterBoxTypes[n].Letterbox = NBTEditor.AddNBTString(LetterBoxTypes[n].Letterbox, "ID", LetterBoxTypes[n].id);
 	        
 	        //Setup crafting recipe
-	        NamespacedKey LetterBoxKey = new NamespacedKey(this, "letterbox" + LetterBoxTypes[n].id);
-	        ShapedRecipe LetterBoxRecipe = new ShapedRecipe(LetterBoxKey, LetterBoxes.get(n));
+	        NamespacedKey LetterBoxKey = new NamespacedKey(this, "letterbox_" + LetterBoxTypes[n].id);
+	        ShapedRecipe LetterBoxRecipe = new ShapedRecipe(LetterBoxKey, LetterBoxTypes[n].Letterbox);
 	        LetterBoxRecipe.shape(" I ", "ICI", "IDI");
 	        LetterBoxRecipe.setIngredient('I', Material.IRON_INGOT);
 	        LetterBoxRecipe.setIngredient('C', Material.CHEST);

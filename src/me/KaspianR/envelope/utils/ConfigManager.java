@@ -1,4 +1,4 @@
-package me.KaspianR.envelope;
+package me.KaspianR.envelope.utils;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import me.KaspianR.envelope.utils.LetterBox;
+import me.KaspianR.envelope.classes.Letterbox;
 
 public class ConfigManager {
 	
@@ -18,9 +18,11 @@ public class ConfigManager {
 	private static File customConfigFile;
     private static FileConfiguration customConfig;
     
-    public static boolean save(List<LetterBox> letterBoxes) {
+    public static boolean save(List<Letterbox> letterBoxes) {
     	
     	try{
+			ConfigManager.getCustomConfig().set("letterBoxes", letterBoxes);
+			ConfigManager.saveCustomConfig();
     		return true;
     	}
     	catch (Exception e) {
@@ -53,7 +55,7 @@ public class ConfigManager {
             Plugin.saveResource("saves.yml", false);
         }
 
-        customConfig= new YamlConfiguration();
+        customConfig = new YamlConfiguration();
         try {
             customConfig.load(customConfigFile);
         } catch (IOException | InvalidConfigurationException e) {

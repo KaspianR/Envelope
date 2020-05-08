@@ -29,7 +29,7 @@ public class Utils {
 		return ChatColor.translateAlternateColorCodes('&', s);
 	}
 	
-	public static ItemStack AddItem(Inventory inv, ItemStack item, int slot) {
+	public static ItemStack SetItem(Inventory inv, ItemStack item, int slot) {
 		
 		inv.setItem(slot, item);
 		
@@ -58,7 +58,6 @@ public class Utils {
     	
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
         if(url.isEmpty())return item;
-        
         
         SkullMeta itemMeta = (SkullMeta) item.getItemMeta();
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);

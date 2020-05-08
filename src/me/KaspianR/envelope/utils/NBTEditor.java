@@ -1,13 +1,14 @@
 package me.KaspianR.envelope.utils;
 
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_15_R1.ItemStack;
+import net.minecraft.server.v1_15_R1.NBTTagCompound;
 
 public class NBTEditor {
 	
 	private static NBTTagCompound GetNBTTag(org.bukkit.inventory.ItemStack item) {
-        net.minecraft.server.v1_14_R1.ItemStack itemNms = CraftItemStack.asNMSCopy(item);
+        ItemStack itemNms = CraftItemStack.asNMSCopy(item);
         NBTTagCompound tag;
         if (itemNms.hasTag()) tag = itemNms.getTag();
         else tag = new NBTTagCompound();
@@ -15,7 +16,7 @@ public class NBTEditor {
     }
 	
     private static org.bukkit.inventory.ItemStack SetNBTTag(org.bukkit.inventory.ItemStack item, NBTTagCompound tag) {
-        net.minecraft.server.v1_14_R1.ItemStack itemNms = CraftItemStack.asNMSCopy(item);
+        ItemStack itemNms = CraftItemStack.asNMSCopy(item);
         itemNms.setTag(tag);
         return CraftItemStack.asBukkitCopy(itemNms);
     }
