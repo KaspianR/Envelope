@@ -75,7 +75,7 @@ public class InventoryClickListener implements Listener {
 				}
 				
 			}
-			else if(slot > 17 && slot < 36) {
+			else {
 				
 				event.setCancelled(true);
 				

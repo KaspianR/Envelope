@@ -152,7 +152,7 @@ public class PlayerInteractListener implements Listener {
 		    		
 		    		if(clickedBlock.getLocation().equals(letterboxes.get(n).position)) {
 		    			
-		    			if(letterboxes.get(n).player.equals(player.getUniqueId())) {
+		    			if(letterboxes.get(n).player.equals(player.getUniqueId()) || player.hasPermission("envelope.open.all")) {
 			    			
 			    			player.openInventory(LetterboxGUI.Show(2, letterboxes.get(n).inventory, letterboxes.get(n).position));
 			    			
